@@ -1,0 +1,1 @@
+-keepclassmembers class com.asi.hardwareinventory.MainActivity$AndroidBridge { @android.webkit.JavascriptInterface <methods>; }

@@ -1,0 +1,11 @@
+HARDWARE INVENTORY ANDROID APP
+
+EASIEST METHOD:
+Open BUILD_APK_WITHOUT_ANDROID_STUDIO.md and follow the GitHub instructions.
+
+ANDROID STUDIO METHOD:
+1. Download Android Studio from developer.android.com/studio
+2. Open this HardwareInventoryAndroid folder.
+3. Wait for Gradle Sync.
+4. Select Build > Build APK(s).
+5. Find the APK at app/build/outputs/apk/debug/app-debug.apk

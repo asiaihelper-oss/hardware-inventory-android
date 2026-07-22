@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hardware Inventory System</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="android-app">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">HI</div>
+        <div>
+          <h1>Hardware Inventory</h1>
+          <p>Asset Tracking System</p>
+        </div>
+      </div>
+
+      <nav>
+        <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+        <button class="nav-btn" data-page="employees">Employees</button>
+        <button class="nav-btn" data-page="assets">Assets</button>
+        <button class="nav-btn" data-page="assignments">Assignments</button>
+        <button class="nav-btn" data-page="history">History</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="loadSampleBtn" class="secondary-btn full">Load Sample Data</button>
+        <button id="clearDataBtn" class="danger-btn full">Clear All Data</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <h2 id="pageTitle">Dashboard</h2>
+          <p id="pageSubtitle">Overview of your hardware inventory</p>
+        </div>
+        <div class="date-badge" id="currentDate"></div>
+      </header>
+
+      <section id="dashboardPage" class="page active">
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span>Total Assets</span>
+            <strong id="statTotalAssets">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Available</span>
+            <strong id="statAvailable">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Assigned</span>
+            <strong id="statAssigned">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Under Repair</span>
+            <strong id="statRepair">0</strong>
+          </article>
+          <article class="stat-card">
+            <span>Employees</span>
+            <strong id="statEmployees">0</strong>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Recent Activity</h3>
+                <p>Latest assignments, returns, and transfers</p>
+              </div>
+            </div>
+            <div id="recentActivity" class="activity-list empty-state">
+              No activity yet.
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Asset Status</h3>
+                <p>Current inventory distribution</p>
+              </div>
+            </div>
+            <div id="statusSummary" class="status-summary"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="employeesPage" class="page">
+        <div class="toolbar">
+          <div class="search-box">
+            <input id="employeeSearch" type="search" placeholder="Search employee name, ID, department..." />
+          </div>
+          <div class="toolbar-actions">
+            <button id="exportEmployeesBtn" class="secondary-btn">Export CSV</button>
+            <button id="addEmployeeBtn" class="primary-btn">Add Employee</button>
+          </div>
+        </div>
+
+        <div class="panel table-panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Employee ID</th>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Position</th>
+                  <th>Status</th>
+                  <th>Assigned Assets</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="employeesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="assetsPage" class="page">
+        <div class="toolbar">
+          <div class="search-box">
+            <input id="assetSearch" type="search" placeholder="Search asset code, serial, brand, model..." />
+          </div>
+          <div class="toolbar-actions">
+            <select id="assetStatusFilter">
+              <option value="">All Statuses</option>
+              <option>Available</option>
+              <option>Assigned</option>
+              <option>Under Repair</option>
+              <option>For Replacement</option>
+              <option>Lost</option>
+              <option>Disposed</option>
+            </select>
+            <button id="exportAssetsBtn" class="secondary-btn">Export CSV</button>
+            <button id="addAssetBtn" class="primary-btn">Add Asset</button>
+          </div>
+        </div>
+
+        <div class="panel table-panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Asset Code</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Brand / Model</th>
+                  <th>Serial Number</th>
+                  <th>Status</th>
+                  <th>Assigned To</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="assetsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="assignmentsPage" class="page">
+        <div class="split-grid">
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Assign Asset</h3>
+                <p>Assign an available asset to an employee</p>
+              </div>
+            </div>
+            <form id="assignmentForm" class="form-grid">
+              <label>
+                Employee
+                <select id="assignEmployee" required></select>
+              </label>
+              <label>
+                Available Asset
+                <select id="assignAsset" required></select>
+              </label>
+              <label>
+                Assignment Date
+                <input id="assignDate" type="date" required />
+              </label>
+              <label>
+                Assigned By
+                <input id="assignedBy" type="text" required placeholder="Name of issuer" />
+              </label>
+              <label>
+                Condition Upon Issuance
+                <select id="conditionOut" required>
+                  <option>Excellent</option>
+                  <option>Good</option>
+                  <option>Fair</option>
+                  <option>For Monitoring</option>
+                </select>
+              </label>
+              <label class="full-span">
+                Remarks
+                <textarea id="assignmentRemarks" rows="3" placeholder="Optional remarks"></textarea>
+              </label>
+              <button type="submit" class="primary-btn full-span">Assign Asset</button>
+            </form>
+          </article>
+
+          <article class="panel">
+            <div class="panel-header">
+              <div>
+                <h3>Currently Assigned</h3>
+                <p>Return or transfer issued assets</p>
+              </div>
+            </div>
+            <div id="currentAssignments" class="assignment-cards"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="historyPage" class="page">
+        <div class="toolbar">
+          <div class="search-box">
+            <input id="historySearch" type="search" placeholder="Search asset code, employee, action..." />
+          </div>
+          <div class="toolbar-actions">
+            <button id="exportHistoryBtn" class="secondary-btn">Export CSV</button>
+          </div>
+        </div>
+
+        <div class="panel table-panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Action</th>
+                  <th>Asset</th>
+                  <th>Employee</th>
+                  <th>Handled By</th>
+                  <th>Condition</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="employeeModal">
+    <form id="employeeForm" method="dialog" class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="employeeModalTitle">Add Employee</h3>
+          <p>Enter the employee details below.</p>
+        </div>
+        <button type="button" class="icon-btn close-modal">×</button>
+      </div>
+
+      <input id="employeeRecordId" type="hidden" />
+      <div class="form-grid">
+        <label>
+          Employee ID
+          <input id="employeeCode" required placeholder="e.g. EMP-001" />
+        </label>
+        <label>
+          Full Name
+          <input id="employeeName" required placeholder="e.g. Juan Dela Cruz" />
+        </label>
+        <label>
+          Department
+          <input id="employeeDepartment" required placeholder="e.g. IT Department" />
+        </label>
+        <label>
+          Position
+          <input id="employeePosition" required placeholder="e.g. IT Support" />
+        </label>
+        <label>
+          Contact Number
+          <input id="employeeContact" placeholder="Optional" />
+        </label>
+        <label>
+          Email
+          <input id="employeeEmail" type="email" placeholder="Optional" />
+        </label>
+        <label>
+          Employment Status
+          <select id="employeeStatus">
+            <option>Active</option>
+            <option>Inactive</option>
+          </select>
+        </label>
+        <label class="full-span">
+          Remarks
+          <textarea id="employeeRemarks" rows="3"></textarea>
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn close-modal">Cancel</button>
+        <button type="submit" class="primary-btn">Save Employee</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="assetModal">
+    <form id="assetForm" method="dialog" class="modal-card wide">
+      <div class="modal-header">
+        <div>
+          <h3 id="assetModalTitle">Add Asset</h3>
+          <p>Enter the hardware asset information.</p>
+        </div>
+        <button type="button" class="icon-btn close-modal">×</button>
+      </div>
+
+      <input id="assetRecordId" type="hidden" />
+      <div class="form-grid three-col">
+        <label>
+          Asset Code
+          <input id="assetCode" required placeholder="e.g. IT-LAP-001" />
+        </label>
+        <label>
+          Category
+          <select id="assetCategory" required>
+            <option>Laptop</option>
+            <option>Desktop</option>
+            <option>Monitor</option>
+            <option>Printer</option>
+            <option>Mobile Phone</option>
+            <option>Tablet</option>
+            <option>Network Device</option>
+            <option>Accessory</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label>
+          Item Description
+          <input id="assetDescription" required placeholder="e.g. Office Laptop" />
+        </label>
+        <label>
+          Brand
+          <input id="assetBrand" placeholder="e.g. Lenovo" />
+        </label>
+        <label>
+          Model
+          <input id="assetModel" placeholder="e.g. ThinkPad E14" />
+        </label>
+        <label>
+          Serial Number
+          <input id="assetSerial" placeholder="Manufacturer serial number" />
+        </label>
+        <label>
+          Purchase Date
+          <input id="assetPurchaseDate" type="date" />
+        </label>
+        <label>
+          Purchase Cost
+          <input id="assetPurchaseCost" type="number" min="0" step="0.01" placeholder="0.00" />
+        </label>
+        <label>
+          Supplier
+          <input id="assetSupplier" />
+        </label>
+        <label>
+          Warranty Expiration
+          <input id="assetWarranty" type="date" />
+        </label>
+        <label>
+          Location
+          <input id="assetLocation" placeholder="e.g. Head Office" />
+        </label>
+        <label>
+          Condition
+          <select id="assetCondition">
+            <option>Excellent</option>
+            <option>Good</option>
+            <option>Fair</option>
+            <option>Poor</option>
+            <option>Damaged</option>
+          </select>
+        </label>
+        <label>
+          Status
+          <select id="assetStatus">
+            <option>Available</option>
+            <option>Under Repair</option>
+            <option>For Replacement</option>
+            <option>Lost</option>
+            <option>Disposed</option>
+          </select>
+        </label>
+        <label class="full-span">
+          Specifications
+          <textarea id="assetSpecifications" rows="3" placeholder="Processor, RAM, storage, etc."></textarea>
+        </label>
+        <label class="full-span">
+          Remarks
+          <textarea id="assetRemarks" rows="3"></textarea>
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn close-modal">Cancel</button>
+        <button type="submit" class="primary-btn">Save Asset</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="returnModal">
+    <form id="returnForm" method="dialog" class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Return Asset</h3>
+          <p>Record the return details.</p>
+        </div>
+        <button type="button" class="icon-btn close-modal">×</button>
+      </div>
+      <input id="returnAssignmentId" type="hidden" />
+      <div class="form-grid">
+        <label>
+          Return Date
+          <input id="returnDate" type="date" required />
+        </label>
+        <label>
+          Received By
+          <input id="receivedBy" required />
+        </label>
+        <label>
+          Condition Returned
+          <select id="conditionReturned" required>
+            <option>Excellent</option>
+            <option>Good</option>
+            <option>Fair</option>
+            <option>Poor</option>
+            <option>Damaged</option>
+          </select>
+        </label>
+        <label>
+          New Asset Status
+          <select id="returnAssetStatus">
+            <option>Available</option>
+            <option>Under Repair</option>
+            <option>For Replacement</option>
+          </select>
+        </label>
+        <label class="full-span">
+          Remarks
+          <textarea id="returnRemarks" rows="3"></textarea>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn close-modal">Cancel</button>
+        <button type="submit" class="primary-btn">Confirm Return</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="transferModal">
+    <form id="transferForm" method="dialog" class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3>Transfer Asset</h3>
+          <p>Transfer the asset to another employee.</p>
+        </div>
+        <button type="button" class="icon-btn close-modal">×</button>
+      </div>
+      <input id="transferAssignmentId" type="hidden" />
+      <div class="form-grid">
+        <label>
+          New Employee
+          <select id="transferEmployee" required></select>
+        </label>
+        <label>
+          Transfer Date
+          <input id="transferDate" type="date" required />
+        </label>
+        <label>
+          Transferred By
+          <input id="transferredBy" required />
+        </label>
+        <label>
+          Current Condition
+          <select id="transferCondition">
+            <option>Excellent</option>
+            <option>Good</option>
+            <option>Fair</option>
+            <option>For Monitoring</option>
+          </select>
+        </label>
+        <label class="full-span">
+          Remarks
+          <textarea id="transferRemarks" rows="3"></textarea>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn close-modal">Cancel</button>
+        <button type="submit" class="primary-btn">Confirm Transfer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
